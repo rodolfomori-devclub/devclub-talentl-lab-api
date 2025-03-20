@@ -125,7 +125,7 @@ const interviewController = {
   },
   
   /**
-   * Retorna um arquivo de áudio
+   * Retorna um arquivo de áudio e o exclui após envio
    */
   async getAudio(req, res) {
     try {
@@ -140,7 +140,34 @@ const interviewController = {
       }
       
       res.setHeader('Content-Type', 'audio/mpeg');
-      fs.createReadStream(audioPath).pipe(res);
+      
+      // Cria um stream de leitura
+      const readStream = fs.createReadStream(audioPath);
+      
+      // Tratamento de erro no stream
+      readStream.on('error', (error) => {
+        console.error('Erro ao ler arquivo de áudio:', error);
+        if (!res.headersSent) {
+          res.status(500).json({
+            success: false,
+            message: 'Erro ao ler o arquivo de áudio'
+          });
+        }
+      });
+      
+      // Quando o stream terminar, excluir o arquivo
+      readStream.on('end', () => {
+        fs.unlink(audioPath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Erro ao excluir arquivo de áudio:', unlinkErr);
+          } else {
+            console.log(`Arquivo de áudio excluído com sucesso: ${audioPath}`);
+          }
+        });
+      });
+      
+      // Pipe do stream para a resposta
+      readStream.pipe(res);
     } catch (error) {
       console.error('Erro ao obter áudio:', error);
       res.status(500).json({ 
