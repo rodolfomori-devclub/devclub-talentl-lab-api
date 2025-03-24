@@ -8,6 +8,7 @@ const routes = require('./routes');
 const app = express();
 
 // Middleware
+app.use(cors())
 app.use(cors({
   origin: '*', // Permite todas as origens em desenvolvimento
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -32,6 +33,10 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3001;
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);

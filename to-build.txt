@@ -1,0 +1,7 @@
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 833785284503.dkr.ecr.us-east-1.amazonaws.com
+
+docker build -t devclub-talent-lab-api .
+
+docker tag devclub-talent-lab-api:latest 833785284503.dkr.ecr.us-east-1.amazonaws.com/devclub-talent-lab-api:latest
+
+docker push 833785284503.dkr.ecr.us-east-1.amazonaws.com/devclub-talent-lab-api:latest
